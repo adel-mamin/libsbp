@@ -402,13 +402,16 @@ s8 sbp_process(sbp_state_t *s, u32 (*read)(u8 *buff, u32 n, void *context))
  *         `SBP_OK_CALLBACK_UNDEFINED` (2) if message decoded with no associated
  *         callback.
  */
+u16 adel_msg_type = 0xDEAD;
 s8 sbp_process_payload(sbp_state_t *s, u16 sender_id, u16 msg_type, u8 msg_len,
                        u8 payload[]) {
   s8 ret = SBP_OK_CALLBACK_UNDEFINED;
   sbp_msg_callbacks_node_t *node;
   for (node = s->sbp_msg_callbacks_head; node; node = node->next) {
     if (node->msg_type == msg_type) {
+      adel_msg_type = msg_type;
       (*node->cb)(sender_id, msg_len, payload, node->context);
+      adel_msg_type = 0xABBA;
       ret = SBP_OK_CALLBACK_EXECUTED;
     }
   }
